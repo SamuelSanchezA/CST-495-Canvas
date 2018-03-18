@@ -19,8 +19,17 @@ class CanvasViewController: UIViewController {
     var newlyCreatedFace: UIImageView!
     var newlyCreatedFaceOriginalCenter: CGPoint!
     
+    var panGesture : UIPanGestureRecognizer!
+    var pinchGesture : UIPinchGestureRecognizer!
+    var rotateGesture : UIRotationGestureRecognizer!
+    
+    var currentRotation : CGFloat!
+    var currentScale : CGFloat!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        currentScale = 0.0
+        currentRotation = 0.0
     }
     
     override func viewDidLayoutSubviews() {
@@ -57,15 +66,29 @@ class CanvasViewController: UIViewController {
     }
     @IBAction func didPanFace(_ sender: UIPanGestureRecognizer) {
         
-        var translation = sender.translation(in: view)
+        let translation = sender.translation(in: view)
         
         if sender.state == .began{
-            var imageView = sender.view as! UIImageView
+            
+            let imageView = sender.view as! UIImageView
             newlyCreatedFace = UIImageView(image: imageView.image)
             view.addSubview(newlyCreatedFace)
             newlyCreatedFace.center = imageView.center
             newlyCreatedFace.center.y += trayView.frame.origin.y
             newlyCreatedFaceOriginalCenter = newlyCreatedFace.center
+            
+            UIView.animate(withDuration: 0.125, animations: {
+                self.newlyCreatedFace.transform = CGAffineTransform(scaleX: 1.8, y: 1.8)
+            })
+            
+            panGesture = UIPanGestureRecognizer(target: self, action: #selector(CanvasViewController.imageDragged(_:)))
+            pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(CanvasViewController.imagePinched(_:)))
+            rotateGesture = UIRotationGestureRecognizer(target: self, action: #selector(CanvasViewController.imageRotated(_:)))
+            
+            newlyCreatedFace.isUserInteractionEnabled = true
+            newlyCreatedFace.addGestureRecognizer(panGesture)
+            newlyCreatedFace.addGestureRecognizer(pinchGesture)
+            newlyCreatedFace.addGestureRecognizer(rotateGesture)
         }
         
         else if sender.state == .changed{
@@ -73,7 +96,66 @@ class CanvasViewController: UIViewController {
         }
         
         else if sender.state == .ended{
+            UIView.animate(withDuration: 0.125, animations: {
+                self.newlyCreatedFace.transform = CGAffineTransform(scaleX: 1, y: 1)
+            })
+        }
+    }
+    
+    @objc func imageDragged(_ sender:UIPanGestureRecognizer){
+        let translation = sender.translation(in: view)
+        
+        if sender.state == .began{
+            newlyCreatedFace = sender.view as! UIImageView // to get the face that we panned on.
+            newlyCreatedFaceOriginalCenter = newlyCreatedFace.center // so we can offset by translation later.
+        }
+        
+        else if sender.state == .changed{
+            newlyCreatedFace.center = CGPoint(x: newlyCreatedFaceOriginalCenter.x + translation.x, y: newlyCreatedFaceOriginalCenter.y + translation.y)
+        }
+    }
+    
+    @objc func imagePinched(_ sender:UIPinchGestureRecognizer){
+        let scale = sender.scale
+        let imageView = sender.view as! UIImageView
+        var t = CGAffineTransform.identity
+        
+        if sender.state == .began{
             
+        }
+        
+        else if sender.state == .changed{
+            if scale >= 1{
+               t = t.scaledBy(x: scale, y: scale)
+            }
+            t = t.rotated(by: self.currentRotation)
+            imageView.transform = t
+        }
+        
+        else if sender.state == .ended{
+            self.currentScale = sender.scale
+            sender.scale = 1
+        }
+    }
+    
+    @objc func imageRotated(_ sender:UIRotationGestureRecognizer){
+        let rotation = sender.rotation
+        let imageView = sender.view as! UIImageView
+        var t = CGAffineTransform.identity
+        
+        if sender.state == .began{
+           
+        }
+        
+        else if sender.state == .changed{
+            t = t.scaledBy(x: self.currentScale, y: self.currentScale)
+            t = t.rotated(by: rotation)
+            imageView.transform = t
+        }
+        
+        else if sender.state == .ended{
+            self.currentRotation = rotation
+            sender.rotation = 0
         }
     }
     
