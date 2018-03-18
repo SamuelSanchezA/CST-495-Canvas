@@ -16,6 +16,8 @@ class CanvasViewController: UIViewController {
     var trayUp: CGPoint!
     var trayDown: CGPoint!
     
+    @IBOutlet weak var downArrow: UIImageView!
+    
     var newlyCreatedFace: UIImageView!
     var newlyCreatedFaceOriginalCenter: CGPoint!
     
@@ -55,11 +57,13 @@ class CanvasViewController: UIViewController {
             if velocity.y > 0 {
                 UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1, options: [], animations: {
                     self.trayView.center = self.trayDown
+                    self.downArrow.transform = CGAffineTransform(rotationAngle: 3.14)
                 }, completion: nil)
             }
             else{
                 UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1, options: [], animations: {
                     self.trayView.center = self.trayUp
+                    self.downArrow.transform = CGAffineTransform(rotationAngle: 0)
                 }, completion: nil)
             }
         }

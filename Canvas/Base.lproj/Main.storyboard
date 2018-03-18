@@ -121,6 +121,7 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="downArrow" destination="M2T-mK-S2F" id="AIz-pL-Fa4"/>
                         <outlet property="trayView" destination="CW9-jz-6Ds" id="QDT-AE-fF0"/>
                     </connections>
                 </viewController>
