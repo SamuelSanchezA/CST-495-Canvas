@@ -73,7 +73,6 @@ class CanvasViewController: UIViewController {
         let translation = sender.translation(in: view)
         
         if sender.state == .began{
-            
             let imageView = sender.view as! UIImageView
             newlyCreatedFace = UIImageView(image: imageView.image)
             view.addSubview(newlyCreatedFace)
@@ -100,9 +99,21 @@ class CanvasViewController: UIViewController {
         }
         
         else if sender.state == .ended{
-            UIView.animate(withDuration: 0.125, animations: {
-                self.newlyCreatedFace.transform = CGAffineTransform(scaleX: 1, y: 1)
-            })
+            if(self.trayView.frame.contains(self.newlyCreatedFace.center)){
+                UIView.animate(withDuration: 0.5, animations: {
+                    var t = CGAffineTransform.identity
+                    t = t.scaledBy(x: 1, y: 1)
+                    self.newlyCreatedFace.center = CGPoint(x: self.newlyCreatedFaceOriginalCenter.x, y: self.newlyCreatedFaceOriginalCenter.y)
+                    self.newlyCreatedFace.transform = t
+                }, completion: { (done) in
+                    self.newlyCreatedFace.removeFromSuperview()
+                })
+            }
+            else{
+                UIView.animate(withDuration: 0.125, animations: {
+                    self.newlyCreatedFace.transform = CGAffineTransform(scaleX: 1, y: 1)
+                })
+            }
         }
     }
     
