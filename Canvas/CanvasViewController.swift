@@ -24,6 +24,7 @@ class CanvasViewController: UIViewController {
     var panGesture : UIPanGestureRecognizer!
     var pinchGesture : UIPinchGestureRecognizer!
     var rotateGesture : UIRotationGestureRecognizer!
+    var twoTapGesture : UITapGestureRecognizer!
     
     var currentRotation : CGFloat!
     var currentScale : CGFloat!
@@ -87,11 +88,14 @@ class CanvasViewController: UIViewController {
             panGesture = UIPanGestureRecognizer(target: self, action: #selector(CanvasViewController.imageDragged(_:)))
             pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(CanvasViewController.imagePinched(_:)))
             rotateGesture = UIRotationGestureRecognizer(target: self, action: #selector(CanvasViewController.imageRotated(_:)))
+            twoTapGesture = UITapGestureRecognizer(target: self, action: #selector(CanvasViewController.imageTwoTapped(_:)))
+            twoTapGesture.numberOfTapsRequired = 2
             
             newlyCreatedFace.isUserInteractionEnabled = true
             newlyCreatedFace.addGestureRecognizer(panGesture)
             newlyCreatedFace.addGestureRecognizer(pinchGesture)
             newlyCreatedFace.addGestureRecognizer(rotateGesture)
+            newlyCreatedFace.addGestureRecognizer(twoTapGesture)
         }
         
         else if sender.state == .changed{
@@ -115,6 +119,10 @@ class CanvasViewController: UIViewController {
                 })
             }
         }
+    }
+    
+    @objc func imageTwoTapped(_ sender: UITapGestureRecognizer){
+        sender.view?.removeFromSuperview()
     }
     
     @objc func imageDragged(_ sender:UIPanGestureRecognizer){
